@@ -20,14 +20,14 @@ function Frame(props: { open?: boolean, children?: ReactNode }) {
 function Item(props: { icon: ReactNode, value: string, name: string }) {
   return <ListItem dense secondaryAction={<IconButton edge='end' onClick={() => { navigator.clipboard.writeText(props.value) }}><ContentCopy color='primary' /></IconButton>}>
     <ListItemIcon>{props.icon}</ListItemIcon>
-    <ListItemText primary={props.value} secondary={props.name} primaryTypographyProps={{ fontFamily: 'monospace', overflow: 'auto', noWrap: true }} secondaryTypographyProps={{ fontFamily: 'monospace' }} />
+    <ListItemText primary={props.value} secondary={props.name} primaryTypographyProps={{ fontFamily: 'monospace', overflow: 'auto', textOverflow: 'clip', noWrap: true }} secondaryTypographyProps={{ fontFamily: 'monospace' }} />
   </ListItem>;
 }
 
 export default function App() {
   const [hash, HASH] = useState(window.location.hash);
   const [errmsg, ERRMSG] = useState('');
-  const input = useRef<HTMLInputElement>(null);
+  const primary = useRef<HTMLInputElement>(null);
   useEffect(
     () => {
       const handler = () => HASH(window.location.hash);
@@ -40,8 +40,8 @@ export default function App() {
     if (/^#?$/.test(hash)) {
       (window as any).ttt = MAGIC_NUMBER;
       return <Frame>
-        <TextField autoFocus fullWidth variant='standard' placeholder='¡USE AT YOUR OWN RISK!' inputRef={input} error={errmsg.length > 0} helperText={errmsg} label='TRANSACTION' onChange={() => ERRMSG('')} />
-        <Button fullWidth onClick={() => { window.location.hash = `/req?net=${MAGIC_NUMBER.MainNet}&tx=${input.current!.value}`; }}>
+        <TextField autoFocus fullWidth variant='standard' placeholder='¡USE AT YOUR OWN RISK!' inputRef={primary} error={errmsg.length > 0} helperText={errmsg} label='TRANSACTION' onChange={() => ERRMSG('')} />
+        <Button fullWidth onClick={() => { window.location.hash = `/req?net=${MAGIC_NUMBER.MainNet}&tx=${primary.current!.value}`; }}>
           <Pageview />
         </Button>
       </Frame>;
@@ -62,13 +62,13 @@ export default function App() {
             <Item icon={<ListAlt color='primary' />} value={`${transaction.attributes.map(v => JSON.stringify(v.export()))}`} name='ATTRIBUTES' />
             <Item icon={<Code color='primary' />} value={`${transaction.script}`} name='SCRIPT' />
           </List>
-          <TextField autoFocus fullWidth variant='standard' placeholder='¡USE AT YOUR OWN RISK!' label='PRIVATE KEY' type='password' autoComplete='current-password' inputRef={input} error={errmsg.length > 0} helperText={errmsg} onChange={() => ERRMSG('')} />
+          <TextField autoFocus fullWidth variant='standard' placeholder='¡USE AT YOUR OWN RISK!' label='PRIVATE KEY' type='password' autoComplete='current-password' inputRef={primary} error={errmsg.length > 0} helperText={errmsg} onChange={() => ERRMSG('')} />
           <Button
             fullWidth
             onClick={() => {
               try {
-                if (!wallet.isPrivateKey(input.current!.value) && !wallet.isWIF(input.current!.value)) throw new Error();
-                const account = new wallet.Account(input.current!.value);
+                if (!wallet.isPrivateKey(primary.current!.value) && !wallet.isWIF(primary.current!.value)) throw new Error();
+                const account = new wallet.Account(primary.current!.value);
                 window.location.hash = `/sig?sig=${wallet.sign(`${num2hexstring(magic, 4, true)}${reverseHex(transaction.hash())}`, account.privateKey)}&addr=${account.address}&scripthash=${account.scriptHash}&pubkey=${account.publicKey}`;
               } catch (e) {
                 ERRMSG('SIGN FAILED')
