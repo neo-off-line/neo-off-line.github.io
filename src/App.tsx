@@ -1,17 +1,20 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { Button, Dialog, DialogContent, DialogTitle, IconButton, Link, List, ListItem, ListItemIcon, ListItemText, TextField } from "@mui/material";
-import { Abc, AccessTime, Code, ContentCopy, Face, Fingerprint, Help, Key, ListAlt, LocalAtm, Pageview, Pin, PriceChange, Tag, Wallet } from '@mui/icons-material';
+import { Abc, AccessTime, Code, ContentCopy, Face, Fingerprint, Help, Key, ListAlt, LocalAtm, Pageview, Pin, PriceChange, Share, Tag, Wallet } from '@mui/icons-material';
 import { tx, wallet } from '@cityofzion/neon-core';
 import { reverseHex, num2hexstring } from '@cityofzion/neon-core/lib/u';
 import { MAGIC_NUMBER } from '@cityofzion/neon-core/lib/consts';
 
 function Frame(props: { open?: boolean, children?: ReactNode }) {
   return <Dialog open={props.open ?? true} fullWidth>
-    <DialogTitle>
-      <Link href='/'>Neo Off Line</Link>
-      <Link sx={{ position: 'absolute', right: 16 }} target='_blank' href='/doc'>
+    <DialogTitle display='flex'>
+      <Link href='/' flexGrow={1}>Neo Off Line</Link>
+      <IconButton onClick={() => { window.navigator.share({ url: window.location.href }) }}>
+        <Share color='primary' />
+      </IconButton>
+      <IconButton onClick={() => { window.location.hash = `/doc`; }}>
         <Help color='info' />
-      </Link>
+      </IconButton>
     </DialogTitle>
     <DialogContent>{props.children}</DialogContent>
   </Dialog>;
@@ -43,9 +46,6 @@ export default function App() {
         <TextField autoFocus fullWidth variant='standard' placeholder='¡USE AT YOUR OWN RISK!' inputRef={primary} error={errmsg.length > 0} helperText={errmsg} label='TRANSACTION' onChange={() => ERRMSG('')} />
         <Button fullWidth onClick={() => { window.location.hash = `/req?net=${MAGIC_NUMBER.MainNet}&tx=${primary.current!.value}`; }}>
           <Pageview />
-        </Button>
-        <Button fullWidth onClick={() => { window.navigator.share({ url: 'https://neo-off-line.github.io/' }) }}>
-          TEST
         </Button>
       </Frame>;
     }
@@ -90,6 +90,10 @@ export default function App() {
             <Item icon={<Key color='info' />} value={pubkey} name='PUBLIC KEY' />
             <Item icon={<Fingerprint color='info' />} value={sig} name='SIGNATURE' />
           </List>
+        </Frame>;
+      case '/doc':
+        return <Frame>
+          TODO
         </Frame>;
       default:
         throw new Error();
