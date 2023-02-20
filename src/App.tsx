@@ -44,6 +44,9 @@ export default function App() {
         <Button fullWidth onClick={() => { window.location.hash = `/req?net=${MAGIC_NUMBER.MainNet}&tx=${primary.current!.value}`; }}>
           <Pageview />
         </Button>
+        <Button fullWidth onClick={() => { window.navigator.share('https://neo-off-line.github.io/') }}>
+          TEST
+        </Button>
       </Frame>;
     }
     const url = new URL(hash.slice(1), window.location.href);
