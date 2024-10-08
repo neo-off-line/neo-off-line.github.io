@@ -56,12 +56,12 @@ function PageSign(props: { url: URL }) {
           if (kp) {
             crypto.subtle.digest('SHA-256', new TextEncoder().encode(primary.current!.value)).then(ab => {
               const account = new wallet.Account(ab2hexstring(ab));
-              window.location.hash = `/signature?signature=${wallet.sign(`${num2hexstring(magic, 4, true)}${reverseHex(transaction.hash())}`, account.privateKey)}&address=${account.address}&scripthash=${account.scriptHash}&publickey=${account.publicKey}`;
+              window.location.hash = `/signature?signature=${wallet.sign(`${num2hexstring(magic, 4, true)}${reverseHex(transaction.hash())}`, account.privateKey)}&address=${account.address}&scripthash=${account.scriptHash}&publickey=${account.publicKey}&signdata=${num2hexstring(magic, 4, true)}${reverseHex(transaction.hash())}`;
             })
           } else {
             if (!wallet.isPrivateKey(primary.current!.value) && !wallet.isWIF(primary.current!.value)) throw new Error();
             const account = new wallet.Account(primary.current!.value);
-            window.location.hash = `/signature?signature=${wallet.sign(`${num2hexstring(magic, 4, true)}${reverseHex(transaction.hash())}`, account.privateKey)}&address=${account.address}&scripthash=${account.scriptHash}&publickey=${account.publicKey}`;
+            window.location.hash = `/signature?signature=${wallet.sign(`${num2hexstring(magic, 4, true)}${reverseHex(transaction.hash())}`, account.privateKey)}&address=${account.address}&scripthash=${account.scriptHash}&publickey=${account.publicKey}&signdata=${num2hexstring(magic, 4, true)}${reverseHex(transaction.hash())}`;
           }
         } catch (e) {
           ERR('SIGN FAILED')
@@ -73,13 +73,14 @@ function PageSign(props: { url: URL }) {
   </Frame>;
 }
 function PageSignature(props: { url: URL }) {
-  const [address, scripthash, publickey, signature] = ['address', 'scripthash', 'publickey', 'signature'].map(v => props.url.searchParams.get(v)!);
+  const [address, scripthash, publickey, signature, signdata] = ['address', 'scripthash', 'publickey', 'signature', 'signdata'].map(v => props.url.searchParams.get(v)!);
   return <Frame>
     <List dense>
       <Item icon={<Wallet color='info' />} value={address} name='ADDRESS' />
       <Item icon={<Tag color='info' />} value={scripthash} name='SCRIPT HASH' />
       <Item icon={<Key color='info' />} value={publickey} name='PUBLIC KEY' />
       <Item icon={<Fingerprint color='info' />} value={signature} name='SIGNATURE' />
+      <Item icon={<Code color='info' />} value={signdata} name='SIGNDATA' />
     </List>
   </Frame>;
 }
